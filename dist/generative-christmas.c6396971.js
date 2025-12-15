@@ -767,10 +767,6 @@ new (0, _p5Default.default)((sk)=>{
             sk._g.image(camFeed, 0, 0, sk._g.width, sk._g.height);
             sk._g.filter(sk.GRAY);
             sk.image(sk._g, MARGIN, MARGIN, thumbWidth, thumbHeight);
-            sk.noFill();
-            sk.stroke(0);
-            sk.strokeWeight(1);
-            sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
             // Draw anchor rectangle on thumb
             if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
                 const mapToThumb = (val, feedStart, feedSize, thumbStart, thumbSize)=>thumbStart + (val - feedStart) / feedSize * thumbSize;

@@ -65,11 +65,6 @@ new p5((sk) => {
       sk._g.filter(sk.GRAY);
       sk.image(sk._g, MARGIN, MARGIN, thumbWidth, thumbHeight);
 
-      sk.noFill();
-      sk.stroke(0);
-      sk.strokeWeight(1);
-      sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
-
       // Draw anchor rectangle on thumb
       if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
         const mapToThumb = (val, feedStart, feedSize, thumbStart, thumbSize) =>
