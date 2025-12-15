@@ -83,7 +83,6 @@ export class OrthogonalGridDeform {
 
   // Update anchor positions from landmarks
   updateAnchors(leftIndexX, leftIndexY, rightIndexX, rightIndexY, rightThumbY) {
-    // Check if landmarks are valid (not undefined or 0)
     if (
       !leftIndexX ||
       !leftIndexY ||
@@ -91,7 +90,6 @@ export class OrthogonalGridDeform {
       !rightIndexY ||
       !rightThumbY
     ) {
-      // Keep default positions if landmarks not detected
       return;
     }
 
