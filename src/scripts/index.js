@@ -26,7 +26,7 @@ new p5((sk) => {
   };
 
   sk.draw = () => {
-    sk.background(0);
+    sk.background(255);
     sk.translate(-sk.width / 2, -sk.height / 2);
 
     const contentWidth = sk.width - MARGIN * 2;
@@ -69,6 +69,47 @@ new p5((sk) => {
       sk.stroke(0);
       sk.strokeWeight(1);
       sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
+
+      // Draw anchor rectangle on thumb
+      if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
+        const mapToThumb = (val, feedStart, feedSize, thumbStart, thumbSize) =>
+          thumbStart + ((val - feedStart) / feedSize) * thumbSize;
+
+        const leftX = mapToThumb(
+          LM.LX8,
+          camFeed.x,
+          camFeed.scaledWidth,
+          MARGIN,
+          thumbWidth
+        );
+        const rightX = mapToThumb(
+          LM.RX8,
+          camFeed.x,
+          camFeed.scaledWidth,
+          MARGIN,
+          thumbWidth
+        );
+        const topY = mapToThumb(
+          LM.RY8,
+          camFeed.y,
+          camFeed.scaledHeight,
+          MARGIN,
+          thumbHeight
+        );
+        const bottomY = mapToThumb(
+          LM.RY4,
+          camFeed.y,
+          camFeed.scaledHeight,
+          MARGIN,
+          thumbHeight
+        );
+
+        sk.stroke(255);
+        sk.strokeWeight(1);
+        sk.noFill();
+        sk.rect(leftX, topY, rightX - leftX, bottomY - topY);
+      }
+
       sk.pop();
     }
   };
