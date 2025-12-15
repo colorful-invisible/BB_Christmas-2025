@@ -743,7 +743,7 @@ new (0, _p5Default.default)((sk)=>{
         camFeed = (0, _videoFeedUtils.initializeCamCapture)(sk, (0, _handModelMediaPipeJs.mediaPipe));
     };
     sk.draw = ()=>{
-        sk.background(255);
+        sk.background(0);
         sk.translate(-sk.width / 2, -sk.height / 2);
         const contentWidth = sk.width - MARGIN * 2;
         const contentHeight = sk.height - MARGIN * 2;

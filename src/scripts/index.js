@@ -26,7 +26,7 @@ new p5((sk) => {
   };
 
   sk.draw = () => {
-    sk.background(255);
+    sk.background(0);
     sk.translate(-sk.width / 2, -sk.height / 2);
 
     const contentWidth = sk.width - MARGIN * 2;
