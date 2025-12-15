@@ -2,84 +2,73 @@ import p5 from "p5";
 import { mediaPipe } from "./handModelMediaPipe.js";
 import { initializeCamCapture, updateFeedDimensions } from "./videoFeedUtils";
 import { getMappedLandmarks } from "./landmarksHandler";
-import { OrthogonalGridDeform } from "./orthogonalGridDeform";
-
+import { createGridDeform } from "./orthogonalGridDeform";
 import { saveSnapshot } from "./utils.js";
 import img01 from "url:../assets/images/grid.png";
+
+const MARGIN = 24;
+const GAP = 24;
+const THUMB_FRACTION = 1 / 5;
 
 new p5((sk) => {
   let camFeed;
   let gridDeform;
-
   const landmarksIndex = [8, 4];
 
   sk.preload = () => {
-    gridDeform = new OrthogonalGridDeform(sk, img01);
+    gridDeform = createGridDeform(sk, img01);
     gridDeform.preload();
   };
 
   sk.setup = () => {
     sk.createCanvas(sk.windowWidth, sk.windowHeight, sk.WEBGL);
     camFeed = initializeCamCapture(sk, mediaPipe);
-    gridDeform.setup();
   };
 
   sk.draw = () => {
     sk.background(255);
     sk.translate(-sk.width / 2, -sk.height / 2);
 
-    // Get hand landmarks
+    const contentWidth = sk.width - MARGIN * 2;
+    const contentHeight = sk.height - MARGIN * 2;
+
+    const thumbWidth = contentWidth * THUMB_FRACTION;
+    const thumbAspect = camFeed ? camFeed.width / camFeed.height : 16 / 9;
+    const thumbHeight = thumbWidth / thumbAspect;
+
+    const imgX = MARGIN + thumbWidth + GAP;
+    const imgY = MARGIN;
+    const imgWidth = contentWidth - thumbWidth - GAP;
+    const imgHeight = contentHeight;
+
+    gridDeform.setBounds(imgX, imgY, imgWidth, imgHeight);
+
     const LM = getMappedLandmarks(sk, mediaPipe, camFeed, landmarksIndex);
 
-    // Extract positions
-    const leftIndexX = LM.LX8;
-    const leftIndexY = LM.LY8;
-    const rightIndexX = LM.RX8;
-    const rightIndexY = LM.RY8;
-    const rightThumbY = LM.RY4;
-
-    // Update and draw deformed grid
-    gridDeform.updateAnchors(
-      leftIndexX,
-      leftIndexY,
-      rightIndexX,
-      rightIndexY,
-      rightThumbY
-    );
-
+    gridDeform.updateAnchors(LM.LX8, LM.LY8, LM.RX8, LM.RY8, LM.RY4);
     gridDeform.draw();
 
-    // Draw camera feed thumbnail
     if (camFeed) {
       sk.push();
-
-      function videoFeedThumb(sk, video, x, y, w, h) {
-        if (
-          !sk._g ||
-          sk._g.width !== Math.round(w) ||
-          sk._g.height !== Math.round(h)
-        ) {
-          if (sk._g) sk._g.remove();
-          sk._g = sk.createGraphics(Math.round(w), Math.round(h));
-        }
-        const g = sk._g;
-        g.image(video, 0, 0, g.width, g.height);
-        g.filter(sk.GRAY);
-        sk.image(g, x, y, w, h);
+      if (
+        !sk._g ||
+        sk._g.width !== Math.round(thumbWidth) ||
+        sk._g.height !== Math.round(thumbHeight)
+      ) {
+        if (sk._g) sk._g.remove();
+        sk._g = sk.createGraphics(
+          Math.round(thumbWidth),
+          Math.round(thumbHeight)
+        );
       }
-
-      // Calculate feed dimensions maintaining aspect ratio
-      const feedWidth = sk.width / 5;
-      const feedAspect = camFeed.width / camFeed.height;
-      const feedHeight = feedWidth / feedAspect;
-
-      videoFeedThumb(sk, camFeed, 24, 24, feedWidth, feedHeight);
+      sk._g.image(camFeed, 0, 0, sk._g.width, sk._g.height);
+      sk._g.filter(sk.GRAY);
+      sk.image(sk._g, MARGIN, MARGIN, thumbWidth, thumbHeight);
 
       sk.noFill();
       sk.stroke(0);
       sk.strokeWeight(1);
-      sk.rect(24, 24, feedWidth, feedHeight);
-
+      sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
       sk.pop();
     }
   };
@@ -87,7 +76,6 @@ new p5((sk) => {
   sk.windowResized = () => {
     sk.resizeCanvas(sk.windowWidth, sk.windowHeight);
     updateFeedDimensions(sk, camFeed, true);
-    gridDeform.resize();
   };
 
   sk.keyPressed = () => {
