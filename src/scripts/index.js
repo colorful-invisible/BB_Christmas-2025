@@ -4,7 +4,7 @@ import { faceMediaPipe } from "./faceModelMediaPipe.js";
 import { initializeCamCapture, updateFeedDimensions } from "./videoFeedUtils";
 import { getMappedLandmarks } from "./landmarksHandler";
 import { createGridDeform } from "./orthogonalGridDeform";
-import img01 from "url:../assets/images/grid_01.png";
+import img01 from "url:../assets/images/grid.png";
 
 const MARGIN = 24;
 const GAP = 24;
@@ -26,14 +26,32 @@ new p5((sk) => {
   const overlay = document.getElementById("overlay");
   const snapshotImg = document.getElementById("snapshot-img");
   const btnDownload = document.getElementById("btn-download");
+  const btnDownloadMobile = document.getElementById("btn-download-mobile");
   const btnShare = document.getElementById("btn-share");
   const btnAgain = document.getElementById("btn-again");
+  const btnAgainMobile = document.getElementById("btn-again-mobile");
+  const btnEmail = document.getElementById("btn-email");
+  const btnWhatsApp = document.getElementById("btn-whatsapp");
+  const btnTwitter = document.getElementById("btn-twitter");
 
   // Button handlers
-  btnStart.addEventListener("click", () => intro.classList.add("hidden"));
-  btnDownload.addEventListener("click", downloadSnapshot);
-  btnShare.addEventListener("click", shareSnapshot);
-  btnAgain.addEventListener("click", closeOverlay);
+  btnStart.addEventListener("click", startExperience);
+  btnDownload?.addEventListener("click", downloadSnapshot);
+  btnDownloadMobile?.addEventListener("click", downloadSnapshot);
+  btnShare?.addEventListener("click", shareSnapshot);
+  btnAgain?.addEventListener("click", closeOverlay);
+  btnAgainMobile?.addEventListener("click", closeOverlay);
+  btnEmail?.addEventListener("click", shareViaEmail);
+  btnWhatsApp?.addEventListener("click", shareViaWhatsApp);
+  btnTwitter?.addEventListener("click", shareViaTwitter);
+
+  function startExperience() {
+    intro.classList.add("hidden");
+    if (!camFeed) {
+      camFeed = initializeCamCapture(sk, mediaPipe);
+      faceMediaPipe.predictWebcam(camFeed);
+    }
+  }
 
   function showOverlay() {
     const dataURL = sk.canvas.toDataURL("image/png");
@@ -57,18 +75,44 @@ new p5((sk) => {
     }, 100);
   }
 
+  const SHARE_TITLE = "Geb auch Du Intoleranz keinen Platz!";
+  const SHARE_URL = "www.myapp.com";
+  const SHARE_TEXT = `${SHARE_TITLE}\n${SHARE_URL}`;
+
   async function shareSnapshot() {
-    if (!navigator.share) {
-      downloadSnapshot();
-      return;
-    }
+    if (!navigator.share || !navigator.canShare) return;
 
     try {
       const response = await fetch(snapshotImg.src);
       const blob = await response.blob();
       const file = new File([blob], "snapshot.png", { type: "image/png" });
-      await navigator.share({ files: [file], title: "Snapshot" });
-    } catch (err) {}
+
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: SHARE_TITLE,
+          text: SHARE_TEXT,
+        });
+      }
+    } catch (err) {
+      // User cancelled or share failed
+    }
+  }
+
+  function shareViaEmail() {
+    const subject = encodeURIComponent(SHARE_TITLE);
+    const body = encodeURIComponent(SHARE_TEXT);
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+  }
+
+  function shareViaWhatsApp() {
+    const text = encodeURIComponent(SHARE_TEXT);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  }
+
+  function shareViaTwitter() {
+    const text = encodeURIComponent(SHARE_TEXT);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
   }
 
   sk.preload = () => {
@@ -78,8 +122,6 @@ new p5((sk) => {
 
   sk.setup = () => {
     sk.createCanvas(sk.windowWidth, sk.windowHeight, sk.WEBGL);
-    camFeed = initializeCamCapture(sk, mediaPipe);
-    faceMediaPipe.predictWebcam(camFeed);
   };
 
   sk.draw = () => {

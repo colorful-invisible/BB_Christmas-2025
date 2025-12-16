@@ -1,3 +1,10 @@
+@font-face {
+  font-family: Everett-Mono;
+  src: url("EverettMono-Regular.83489e7c.woff2") format("woff2"), url("EverettMono-Regular.0fd8f795.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,7 +14,7 @@
 html {
   color: #fff;
   background: #000;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Everett-Mono, monospace, Arial, Helvetica, sans-serif;
   font-size: 16px;
 }
 
@@ -32,9 +39,10 @@ canvas {
   background: #000;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  transition: opacity .6s ease-out;
+  width: 100dvw;
+  height: 100dvh;
+  padding: 1.25rem;
+  transition: opacity .3s ease-out;
   display: flex;
   position: fixed;
   top: 0;
@@ -49,46 +57,36 @@ canvas {
 .intro-content {
   flex-direction: column;
   align-items: flex-start;
-  gap: 24px;
-  font-family: monospace;
-  font-size: 16px;
+  gap: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1.5;
   display: flex;
 }
 
-.intro-title {
-  margin-bottom: 8px;
-  font-size: 16px;
-  font-weight: normal;
+.intro-content h2 {
+  font-size: 1.25rem;
   text-decoration: underline;
 }
 
-.intro-instructions {
-  flex-direction: column;
-  gap: 16px;
-  display: flex;
+.btn {
+  color: #fff;
+  cursor: pointer;
+  background-color: #0000;
+  border: 2px solid #fff;
+  border-radius: 9999px;
+  padding: .35rem 1rem .4rem;
+  font-family: Everett-Mono, monospace, Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  transition: background-color .3s, color .2s;
 }
 
-.intro-instructions p {
-  margin: 0;
+.btn:hover {
+  color: #000;
+  background-color: #fff;
 }
 
 .btn-start {
-  color: #fff;
-  cursor: pointer;
-  background: none;
-  border: 1px solid #fff;
-  border-radius: 16px;
-  margin-top: 48px;
-  padding: 8px 24px;
-  font-family: monospace;
-  font-size: 14px;
-  transition: background .2s, color .2s;
-}
-
-.btn-start:hover {
-  color: #000;
-  background: #fff;
+  margin-top: 1.5rem;
 }
 
 .overlay {
@@ -97,9 +95,9 @@ canvas {
   background: #000000bf;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 24px;
+  width: 100dvw;
+  height: 100dvh;
+  padding: 1.25rem;
   display: flex;
   position: fixed;
   top: 0;
@@ -113,58 +111,84 @@ canvas {
 .overlay-content {
   flex-direction: row;
   align-items: center;
-  gap: 24px;
-  max-width: 90vw;
-  max-height: 90vh;
+  gap: 1.5rem;
   display: flex;
 }
 
-.overlay-content img {
+.overlay-content > img {
   object-fit: contain;
   border: 2px solid #fff;
-  max-width: 60vw;
-  max-height: 80vh;
+  max-width: 60%;
+  max-height: 80%;
 }
 
 .overlay-buttons {
   flex-direction: column;
-  gap: 8px;
+  gap: .5rem;
   display: flex;
 }
 
-.overlay-buttons button {
-  color: #fff;
-  cursor: pointer;
-  white-space: nowrap;
-  background: none;
-  border: 1px solid #fff;
-  border-radius: 16px;
-  padding: 8px 16px;
-  font-family: monospace;
-  font-size: 14px;
-  transition: background .2s, color .2s;
+.overlay-buttons-mobile {
+  display: none;
 }
 
-.overlay-buttons button:hover {
-  color: #000;
-  background: #fff;
+.overlay-buttons-desktop {
+  flex-direction: column;
+  gap: 1.5rem;
+  display: flex;
+}
+
+.btn-again-desktop {
+  display: block;
+}
+
+.flex-row {
+  flex-direction: row;
+  gap: 1rem;
+  display: flex;
+}
+
+.share-icon {
+  cursor: pointer;
+  border: unset;
+  background: none;
+  justify-content: center;
+  align-items: center;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+}
+
+.share-icon img {
+  object-fit: contain;
+  filter: invert();
+  width: 100%;
+  height: 100%;
 }
 
 @media (orientation: portrait) {
   .overlay {
     align-items: flex-start;
-    padding: 10vh 8px 8px;
+    padding: 10vh .5rem .5rem;
   }
 
   .overlay-content {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 1rem;
   }
 
-  .overlay-content img {
+  .overlay-content > img {
     max-width: 80vw;
     max-height: 60vh;
+  }
+
+  .overlay-buttons-mobile {
+    display: flex;
+  }
+
+  .overlay-buttons-desktop, .btn-again-desktop {
+    display: none;
   }
 }
 /*# sourceMappingURL=generative-christmas.4ee4707b.css.map */

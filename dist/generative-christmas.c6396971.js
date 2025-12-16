@@ -722,8 +722,8 @@ var _faceModelMediaPipeJs = require("./faceModelMediaPipe.js");
 var _videoFeedUtils = require("./videoFeedUtils");
 var _landmarksHandler = require("./landmarksHandler");
 var _orthogonalGridDeform = require("./orthogonalGridDeform");
-var _grid01Png = require("url:../assets/images/grid_01.png");
-var _grid01PngDefault = parcelHelpers.interopDefault(_grid01Png);
+var _gridPng = require("url:../assets/images/grid.png");
+var _gridPngDefault = parcelHelpers.interopDefault(_gridPng);
 const MARGIN = 24;
 const GAP = 24;
 const MARGIN_MOBILE = 8;
@@ -745,13 +745,30 @@ new (0, _p5Default.default)((sk)=>{
     const overlay = document.getElementById("overlay");
     const snapshotImg = document.getElementById("snapshot-img");
     const btnDownload = document.getElementById("btn-download");
+    const btnDownloadMobile = document.getElementById("btn-download-mobile");
     const btnShare = document.getElementById("btn-share");
     const btnAgain = document.getElementById("btn-again");
+    const btnAgainMobile = document.getElementById("btn-again-mobile");
+    const btnEmail = document.getElementById("btn-email");
+    const btnWhatsApp = document.getElementById("btn-whatsapp");
+    const btnTwitter = document.getElementById("btn-twitter");
     // Button handlers
-    btnStart.addEventListener("click", ()=>intro.classList.add("hidden"));
-    btnDownload.addEventListener("click", downloadSnapshot);
-    btnShare.addEventListener("click", shareSnapshot);
-    btnAgain.addEventListener("click", closeOverlay);
+    btnStart.addEventListener("click", startExperience);
+    btnDownload?.addEventListener("click", downloadSnapshot);
+    btnDownloadMobile?.addEventListener("click", downloadSnapshot);
+    btnShare?.addEventListener("click", shareSnapshot);
+    btnAgain?.addEventListener("click", closeOverlay);
+    btnAgainMobile?.addEventListener("click", closeOverlay);
+    btnEmail?.addEventListener("click", shareViaEmail);
+    btnWhatsApp?.addEventListener("click", shareViaWhatsApp);
+    btnTwitter?.addEventListener("click", shareViaTwitter);
+    function startExperience() {
+        intro.classList.add("hidden");
+        if (!camFeed) {
+            camFeed = (0, _videoFeedUtils.initializeCamCapture)(sk, (0, _handModelMediaPipeJs.mediaPipe));
+            (0, _faceModelMediaPipeJs.faceMediaPipe).predictWebcam(camFeed);
+        }
+    }
     function showOverlay() {
         const dataURL = sk.canvas.toDataURL("image/png");
         snapshotImg.src = dataURL;
@@ -771,11 +788,11 @@ new (0, _p5Default.default)((sk)=>{
             document.body.removeChild(link);
         }, 100);
     }
+    const SHARE_TITLE = "Geb auch Du Intoleranz keinen Platz!";
+    const SHARE_URL = "www.myapp.com";
+    const SHARE_TEXT = `${SHARE_TITLE}\n${SHARE_URL}`;
     async function shareSnapshot() {
-        if (!navigator.share) {
-            downloadSnapshot();
-            return;
-        }
+        if (!navigator.share || !navigator.canShare) return;
         try {
             const response = await fetch(snapshotImg.src);
             const blob = await response.blob();
@@ -784,22 +801,40 @@ new (0, _p5Default.default)((sk)=>{
             ], "snapshot.png", {
                 type: "image/png"
             });
-            await navigator.share({
+            if (navigator.canShare({
+                files: [
+                    file
+                ]
+            })) await navigator.share({
                 files: [
                     file
                 ],
-                title: "Snapshot"
+                title: SHARE_TITLE,
+                text: SHARE_TEXT
             });
-        } catch (err) {}
+        } catch (err) {
+        // User cancelled or share failed
+        }
+    }
+    function shareViaEmail() {
+        const subject = encodeURIComponent(SHARE_TITLE);
+        const body = encodeURIComponent(SHARE_TEXT);
+        window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+    }
+    function shareViaWhatsApp() {
+        const text = encodeURIComponent(SHARE_TEXT);
+        window.open(`https://wa.me/?text=${text}`, "_blank");
+    }
+    function shareViaTwitter() {
+        const text = encodeURIComponent(SHARE_TEXT);
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
     }
     sk.preload = ()=>{
-        gridDeform = (0, _orthogonalGridDeform.createGridDeform)(sk, (0, _grid01PngDefault.default));
+        gridDeform = (0, _orthogonalGridDeform.createGridDeform)(sk, (0, _gridPngDefault.default));
         gridDeform.preload();
     };
     sk.setup = ()=>{
         sk.createCanvas(sk.windowWidth, sk.windowHeight, sk.WEBGL);
-        camFeed = (0, _videoFeedUtils.initializeCamCapture)(sk, (0, _handModelMediaPipeJs.mediaPipe));
-        (0, _faceModelMediaPipeJs.faceMediaPipe).predictWebcam(camFeed);
     };
     sk.draw = ()=>{
         sk.background(0);
@@ -891,7 +926,7 @@ new (0, _p5Default.default)((sk)=>{
     };
 });
 
-},{"p5":"6IEby","./handModelMediaPipe.js":"3NAKG","./faceModelMediaPipe.js":"77VZ0","./videoFeedUtils":"KriuE","./landmarksHandler":"gNlhQ","./orthogonalGridDeform":"fCxIP","url:../assets/images/grid_01.png":"dnAfH","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6IEby":[function(require,module,exports,__globalThis) {
+},{"p5":"6IEby","./handModelMediaPipe.js":"3NAKG","./faceModelMediaPipe.js":"77VZ0","./videoFeedUtils":"KriuE","./landmarksHandler":"gNlhQ","./orthogonalGridDeform":"fCxIP","url:../assets/images/grid.png":"ceOPV","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6IEby":[function(require,module,exports,__globalThis) {
 /*! p5.js v1.11.10 August 23, 2025 */ var global = arguments[3];
 !function(e1) {
     module.exports = e1();
@@ -47042,8 +47077,8 @@ function draw(state) {
     sk.pop();
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"dnAfH":[function(require,module,exports,__globalThis) {
-module.exports = module.bundle.resolve("grid_01.f9e7b57d.png") + "?" + Date.now();
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"ceOPV":[function(require,module,exports,__globalThis) {
+module.exports = module.bundle.resolve("grid.a9569c75.png") + "?" + Date.now();
 
 },{}]},["2aZ6o","8JWvp"], "8JWvp", "parcelRequire94c2", {}, "./", "/")
 
