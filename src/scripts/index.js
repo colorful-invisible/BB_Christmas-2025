@@ -58,6 +58,10 @@ new p5((sk) => {
     intro.classList.add("hidden");
     if (!camFeed) {
       camFeed = initializeCamCapture(sk, mediaPipe);
+      if (!camFeed) {
+        // Handle the case where camera access is denied
+        return;
+      }
       faceMediaPipe.predictWebcam(camFeed);
     }
   }
@@ -104,7 +108,7 @@ new p5((sk) => {
         });
       }
     } catch (err) {
-      // User cancelled or share failed
+      console.error("Error sharing snapshot:", err);
     }
   }
 
