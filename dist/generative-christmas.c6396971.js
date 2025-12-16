@@ -760,7 +760,11 @@ new (0, _p5Default.default)((sk)=>{
         const link = document.createElement("a");
         link.download = `snapshot_${Date.now()}.png`;
         link.href = snapshotImg.src;
+        document.body.appendChild(link);
         link.click();
+        setTimeout(()=>{
+            document.body.removeChild(link);
+        }, 100);
     }
     async function shareSnapshot() {
         if (!navigator.share) {
