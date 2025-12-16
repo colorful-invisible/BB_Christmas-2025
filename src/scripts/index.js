@@ -8,6 +8,8 @@ import img01 from "url:../assets/images/grid.png";
 
 const MARGIN = 24;
 const GAP = 24;
+const MARGIN_MOBILE = 8;
+const GAP_MOBILE = 8;
 const THUMB_FRACTION = 1 / 5;
 const MOUTH_OPEN_THRESHOLD = 0.05;
 
@@ -16,6 +18,8 @@ new p5((sk) => {
   let gridDeform;
   let snapshotPending = false;
   let mouthWasClosed = true;
+  let thumbGraphics = null;
+  let resizeTimeout = null;
   const landmarksIndex = [8, 4];
 
   // DOM elements
@@ -24,14 +28,32 @@ new p5((sk) => {
   const overlay = document.getElementById("overlay");
   const snapshotImg = document.getElementById("snapshot-img");
   const btnDownload = document.getElementById("btn-download");
+  const btnDownloadMobile = document.getElementById("btn-download-mobile");
   const btnShare = document.getElementById("btn-share");
   const btnAgain = document.getElementById("btn-again");
+  const btnAgainMobile = document.getElementById("btn-again-mobile");
+  const btnEmail = document.getElementById("btn-email");
+  const btnWhatsApp = document.getElementById("btn-whatsapp");
+  const btnTwitter = document.getElementById("btn-twitter");
 
   // Button handlers
-  btnStart.addEventListener("click", () => intro.classList.add("hidden"));
-  btnDownload.addEventListener("click", downloadSnapshot);
-  btnShare.addEventListener("click", shareSnapshot);
-  btnAgain.addEventListener("click", closeOverlay);
+  btnStart.addEventListener("click", startExperience);
+  btnDownload?.addEventListener("click", downloadSnapshot);
+  btnDownloadMobile?.addEventListener("click", downloadSnapshot);
+  btnShare?.addEventListener("click", shareSnapshot);
+  btnAgain?.addEventListener("click", closeOverlay);
+  btnAgainMobile?.addEventListener("click", closeOverlay);
+  btnEmail?.addEventListener("click", shareViaEmail);
+  btnWhatsApp?.addEventListener("click", shareViaWhatsApp);
+  btnTwitter?.addEventListener("click", shareViaTwitter);
+
+  function startExperience() {
+    intro.classList.add("hidden");
+    if (!camFeed) {
+      camFeed = initializeCamCapture(sk, mediaPipe);
+      faceMediaPipe.predictWebcam(camFeed);
+    }
+  }
 
   function showOverlay() {
     const dataURL = sk.canvas.toDataURL("image/png");
@@ -55,18 +77,44 @@ new p5((sk) => {
     }, 100);
   }
 
+  const SHARE_TITLE = "Geb auch Du Intoleranz keinen Platz!";
+  const SHARE_URL = "www.2025.brueckner.studio";
+  const SHARE_TEXT = `${SHARE_TITLE}\n${SHARE_URL}`;
+
   async function shareSnapshot() {
-    if (!navigator.share) {
-      downloadSnapshot();
-      return;
-    }
+    if (!navigator.share || !navigator.canShare) return;
 
     try {
       const response = await fetch(snapshotImg.src);
       const blob = await response.blob();
       const file = new File([blob], "snapshot.png", { type: "image/png" });
-      await navigator.share({ files: [file], title: "Snapshot" });
-    } catch (err) {}
+
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: SHARE_TITLE,
+          text: SHARE_TEXT,
+        });
+      }
+    } catch (err) {
+      // User cancelled or share failed
+    }
+  }
+
+  function shareViaEmail() {
+    const subject = encodeURIComponent(SHARE_TITLE);
+    const body = encodeURIComponent(SHARE_TEXT);
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+  }
+
+  function shareViaWhatsApp() {
+    const text = encodeURIComponent(SHARE_TEXT);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  }
+
+  function shareViaTwitter() {
+    const text = encodeURIComponent(SHARE_TEXT);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
   }
 
   sk.preload = () => {
@@ -75,26 +123,48 @@ new p5((sk) => {
   };
 
   sk.setup = () => {
-    sk.createCanvas(sk.windowWidth, sk.windowHeight, sk.WEBGL);
-    camFeed = initializeCamCapture(sk, mediaPipe);
-    faceMediaPipe.predictWebcam(camFeed);
+    // Use window.innerWidth/Height for consistent sizing
+    sk.createCanvas(window.innerWidth, window.innerHeight, sk.WEBGL);
   };
 
   sk.draw = () => {
     sk.background(0);
     sk.translate(-sk.width / 2, -sk.height / 2);
 
-    const contentWidth = sk.width - MARGIN * 2;
-    const contentHeight = sk.height - MARGIN * 2;
-
-    const thumbWidth = contentWidth * THUMB_FRACTION;
+    const isMobile = sk.width < sk.height;
+    const margin = isMobile ? MARGIN_MOBILE : MARGIN;
+    const gap = isMobile ? GAP_MOBILE : GAP;
+    const contentWidth = sk.width - margin * 2;
+    const contentHeight = sk.height - margin * 2;
     const thumbAspect = camFeed ? camFeed.width / camFeed.height : 16 / 9;
-    const thumbHeight = thumbWidth / thumbAspect;
 
-    const imgX = MARGIN + thumbWidth + GAP;
-    const imgY = MARGIN;
-    const imgWidth = contentWidth - thumbWidth - GAP;
-    const imgHeight = contentHeight;
+    let thumbX, thumbY, thumbWidth, thumbHeight;
+    let imgX, imgY, imgWidth, imgHeight;
+
+    if (isMobile) {
+      // Mobile: image on top, thumb on bottom right
+      thumbHeight = contentHeight * THUMB_FRACTION;
+      thumbWidth = thumbHeight * thumbAspect;
+
+      imgX = margin;
+      imgY = margin;
+      imgWidth = contentWidth;
+      imgHeight = contentHeight - thumbHeight - gap;
+
+      thumbX = margin + contentWidth - thumbWidth;
+      thumbY = margin + imgHeight + gap;
+    } else {
+      // Desktop: thumb on left, image on right
+      thumbWidth = contentWidth * THUMB_FRACTION;
+      thumbHeight = thumbWidth / thumbAspect;
+      thumbX = margin;
+      thumbY = margin;
+
+      imgX = margin + thumbWidth + gap;
+      imgY = margin;
+      imgWidth = contentWidth - thumbWidth - gap;
+      imgHeight = contentHeight;
+    }
 
     gridDeform.setBounds(imgX, imgY, imgWidth, imgHeight);
 
@@ -105,25 +175,41 @@ new p5((sk) => {
 
     if (camFeed) {
       sk.push();
+
+      const targetWidth = Math.round(thumbWidth);
+      const targetHeight = Math.round(thumbHeight);
+
+      // Only recreate graphics buffer if size changed significantly
       if (
-        !sk._g ||
-        sk._g.width !== Math.round(thumbWidth) ||
-        sk._g.height !== Math.round(thumbHeight)
+        !thumbGraphics ||
+        Math.abs(thumbGraphics.width - targetWidth) > 2 ||
+        Math.abs(thumbGraphics.height - targetHeight) > 2
       ) {
-        if (sk._g) sk._g.remove();
-        sk._g = sk.createGraphics(
-          Math.round(thumbWidth),
-          Math.round(thumbHeight)
-        );
+        if (thumbGraphics) {
+          thumbGraphics.remove();
+          thumbGraphics = null;
+        }
+        if (targetWidth > 0 && targetHeight > 0) {
+          thumbGraphics = sk.createGraphics(targetWidth, targetHeight);
+        }
       }
-      sk._g.image(camFeed, 0, 0, sk._g.width, sk._g.height);
-      sk._g.filter(sk.GRAY);
-      sk.image(sk._g, MARGIN, MARGIN, thumbWidth, thumbHeight);
+
+      if (thumbGraphics) {
+        thumbGraphics.image(
+          camFeed,
+          0,
+          0,
+          thumbGraphics.width,
+          thumbGraphics.height
+        );
+        thumbGraphics.filter(sk.GRAY);
+        sk.image(thumbGraphics, thumbX, thumbY, thumbWidth, thumbHeight);
+      }
 
       sk.noFill();
       sk.stroke(0);
       sk.strokeWeight(1);
-      sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
+      sk.rect(thumbX, thumbY, thumbWidth, thumbHeight);
 
       // Draw anchor rectangle on thumb
       if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
@@ -134,28 +220,28 @@ new p5((sk) => {
           LM.LX8,
           camFeed.x,
           camFeed.scaledWidth,
-          MARGIN,
+          thumbX,
           thumbWidth
         );
         const rightX = mapToThumb(
           LM.RX8,
           camFeed.x,
           camFeed.scaledWidth,
-          MARGIN,
+          thumbX,
           thumbWidth
         );
         const topY = mapToThumb(
           LM.RY8,
           camFeed.y,
           camFeed.scaledHeight,
-          MARGIN,
+          thumbY,
           thumbHeight
         );
         const bottomY = mapToThumb(
           LM.RY4,
           camFeed.y,
           camFeed.scaledHeight,
-          MARGIN,
+          thumbY,
           thumbHeight
         );
 
@@ -192,8 +278,23 @@ new p5((sk) => {
   };
 
   sk.windowResized = () => {
-    sk.resizeCanvas(sk.windowWidth, sk.windowHeight);
-    updateFeedDimensions(sk, camFeed, true);
+    // Debounce resize to prevent WebGL context buildup
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+    }
+
+    resizeTimeout = setTimeout(() => {
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      if (newWidth > 0 && newHeight > 0) {
+        sk.resizeCanvas(newWidth, newHeight);
+
+        if (camFeed) {
+          updateFeedDimensions(sk, camFeed, newHeight > newWidth);
+        }
+      }
+    }, 100);
   };
 
   sk.keyPressed = () => {
@@ -208,6 +309,14 @@ new p5((sk) => {
 
     if (sk.key === "s" || sk.key === "S") {
       showOverlay();
+    }
+  };
+
+  // Cleanup on remove
+  sk.remove = () => {
+    if (thumbGraphics) {
+      thumbGraphics.remove();
+      thumbGraphics = null;
     }
   };
 });
