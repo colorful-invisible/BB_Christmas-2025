@@ -4,7 +4,7 @@ import { faceMediaPipe } from "./faceModelMediaPipe.js";
 import { initializeCamCapture, updateFeedDimensions } from "./videoFeedUtils";
 import { getMappedLandmarks } from "./landmarksHandler";
 import { createGridDeform } from "./orthogonalGridDeform";
-import img01 from "url:../assets/images/grid.png";
+import img01 from "url:../assets/images/grid_01.png";
 
 const MARGIN = 24;
 const GAP = 24;

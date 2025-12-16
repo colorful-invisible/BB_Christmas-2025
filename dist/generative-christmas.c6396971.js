@@ -722,8 +722,8 @@ var _faceModelMediaPipeJs = require("./faceModelMediaPipe.js");
 var _videoFeedUtils = require("./videoFeedUtils");
 var _landmarksHandler = require("./landmarksHandler");
 var _orthogonalGridDeform = require("./orthogonalGridDeform");
-var _gridPng = require("url:../assets/images/grid.png");
-var _gridPngDefault = parcelHelpers.interopDefault(_gridPng);
+var _grid01Png = require("url:../assets/images/grid_01.png");
+var _grid01PngDefault = parcelHelpers.interopDefault(_grid01Png);
 const MARGIN = 24;
 const GAP = 24;
 const MARGIN_MOBILE = 8;
@@ -793,7 +793,7 @@ new (0, _p5Default.default)((sk)=>{
         } catch (err) {}
     }
     sk.preload = ()=>{
-        gridDeform = (0, _orthogonalGridDeform.createGridDeform)(sk, (0, _gridPngDefault.default));
+        gridDeform = (0, _orthogonalGridDeform.createGridDeform)(sk, (0, _grid01PngDefault.default));
         gridDeform.preload();
     };
     sk.setup = ()=>{
@@ -891,7 +891,7 @@ new (0, _p5Default.default)((sk)=>{
     };
 });
 
-},{"p5":"6IEby","./handModelMediaPipe.js":"3NAKG","./faceModelMediaPipe.js":"77VZ0","./videoFeedUtils":"KriuE","./landmarksHandler":"gNlhQ","./orthogonalGridDeform":"fCxIP","url:../assets/images/grid.png":"ceOPV","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6IEby":[function(require,module,exports,__globalThis) {
+},{"p5":"6IEby","./handModelMediaPipe.js":"3NAKG","./faceModelMediaPipe.js":"77VZ0","./videoFeedUtils":"KriuE","./landmarksHandler":"gNlhQ","./orthogonalGridDeform":"fCxIP","url:../assets/images/grid_01.png":"dnAfH","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6IEby":[function(require,module,exports,__globalThis) {
 /*! p5.js v1.11.10 August 23, 2025 */ var global = arguments[3];
 !function(e1) {
     module.exports = e1();
@@ -47042,8 +47042,8 @@ function draw(state) {
     sk.pop();
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"ceOPV":[function(require,module,exports,__globalThis) {
-module.exports = module.bundle.resolve("grid.a9569c75.png") + "?" + Date.now();
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"dnAfH":[function(require,module,exports,__globalThis) {
+module.exports = module.bundle.resolve("grid_01.f9e7b57d.png") + "?" + Date.now();
 
 },{}]},["2aZ6o","8JWvp"], "8JWvp", "parcelRequire94c2", {}, "./", "/")
 
