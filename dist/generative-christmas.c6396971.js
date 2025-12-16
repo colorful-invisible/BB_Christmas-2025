@@ -718,22 +718,71 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _p5 = require("p5");
 var _p5Default = parcelHelpers.interopDefault(_p5);
 var _handModelMediaPipeJs = require("./handModelMediaPipe.js");
+var _faceModelMediaPipeJs = require("./faceModelMediaPipe.js");
 var _videoFeedUtils = require("./videoFeedUtils");
 var _landmarksHandler = require("./landmarksHandler");
 var _orthogonalGridDeform = require("./orthogonalGridDeform");
-var _utilsJs = require("./utils.js");
 var _gridPng = require("url:../assets/images/grid.png");
 var _gridPngDefault = parcelHelpers.interopDefault(_gridPng);
 const MARGIN = 24;
 const GAP = 24;
 const THUMB_FRACTION = 0.2;
+const MOUTH_OPEN_THRESHOLD = 0.05;
 new (0, _p5Default.default)((sk)=>{
     let camFeed;
     let gridDeform;
+    let snapshotPending = false;
+    let mouthWasClosed = true;
     const landmarksIndex = [
         8,
         4
     ];
+    // DOM elements
+    const overlay = document.getElementById("overlay");
+    const snapshotImg = document.getElementById("snapshot-img");
+    const btnDownload = document.getElementById("btn-download");
+    const btnShare = document.getElementById("btn-share");
+    const btnAgain = document.getElementById("btn-again");
+    // Button handlers
+    btnDownload.addEventListener("click", downloadSnapshot);
+    btnShare.addEventListener("click", shareSnapshot);
+    btnAgain.addEventListener("click", closeOverlay);
+    function showOverlay() {
+        const dataURL = sk.canvas.toDataURL("image/png");
+        snapshotImg.src = dataURL;
+        overlay.classList.remove("hidden");
+    }
+    function closeOverlay() {
+        overlay.classList.add("hidden");
+        snapshotImg.src = "";
+    }
+    function downloadSnapshot() {
+        const link = document.createElement("a");
+        link.download = `snapshot_${Date.now()}.png`;
+        link.href = snapshotImg.src;
+        link.click();
+    }
+    async function shareSnapshot() {
+        if (!navigator.share) {
+            downloadSnapshot();
+            return;
+        }
+        try {
+            const response = await fetch(snapshotImg.src);
+            const blob = await response.blob();
+            const file = new File([
+                blob
+            ], "snapshot.png", {
+                type: "image/png"
+            });
+            await navigator.share({
+                files: [
+                    file
+                ],
+                title: "Snapshot"
+            });
+        } catch (err) {}
+    }
     sk.preload = ()=>{
         gridDeform = (0, _orthogonalGridDeform.createGridDeform)(sk, (0, _gridPngDefault.default));
         gridDeform.preload();
@@ -741,9 +790,10 @@ new (0, _p5Default.default)((sk)=>{
     sk.setup = ()=>{
         sk.createCanvas(sk.windowWidth, sk.windowHeight, sk.WEBGL);
         camFeed = (0, _videoFeedUtils.initializeCamCapture)(sk, (0, _handModelMediaPipeJs.mediaPipe));
+        (0, _faceModelMediaPipeJs.faceMediaPipe).predictWebcam(camFeed);
     };
     sk.draw = ()=>{
-        sk.background(255);
+        sk.background(0);
         sk.translate(-sk.width / 2, -sk.height / 2);
         const contentWidth = sk.width - MARGIN * 2;
         const contentHeight = sk.height - MARGIN * 2;
@@ -767,6 +817,10 @@ new (0, _p5Default.default)((sk)=>{
             sk._g.image(camFeed, 0, 0, sk._g.width, sk._g.height);
             sk._g.filter(sk.GRAY);
             sk.image(sk._g, MARGIN, MARGIN, thumbWidth, thumbHeight);
+            sk.noFill();
+            sk.stroke(0);
+            sk.strokeWeight(1);
+            sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
             // Draw anchor rectangle on thumb
             if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
                 const mapToThumb = (val, feedStart, feedSize, thumbStart, thumbSize)=>thumbStart + (val - feedStart) / feedSize * thumbSize;
@@ -781,23 +835,34 @@ new (0, _p5Default.default)((sk)=>{
             }
             sk.pop();
         }
+        // Mouth open detection for snapshot
+        const mouthOpen = (0, _faceModelMediaPipeJs.faceMediaPipe).getMouthOpen();
+        const isOpen = mouthOpen > MOUTH_OPEN_THRESHOLD;
+        if (isOpen && mouthWasClosed && !snapshotPending && overlay.classList.contains("hidden")) {
+            snapshotPending = true;
+            setTimeout(()=>{
+                showOverlay();
+                snapshotPending = false;
+                mouthWasClosed = false;
+            }, 700);
+        }
+        if (!isOpen && !snapshotPending) mouthWasClosed = true;
     };
     sk.windowResized = ()=>{
         sk.resizeCanvas(sk.windowWidth, sk.windowHeight);
         (0, _videoFeedUtils.updateFeedDimensions)(sk, camFeed, true);
     };
     sk.keyPressed = ()=>{
-        if (sk.key === "s" || sk.key === "S") {
-            console.log("Snapshot will be taken in 3 seconds...");
-            setTimeout(()=>{
-                (0, _utilsJs.saveSnapshot)(sk, sk.pixelDensity(), 2);
-                console.log("Snapshot saved!");
-            }, 3000);
+        if (!overlay.classList.contains("hidden")) {
+            if (sk.key === "d" || sk.key === "D") downloadSnapshot();
+            else if (sk.key === "Escape" || sk.key === " ") closeOverlay();
+            return;
         }
+        if (sk.key === "s" || sk.key === "S") showOverlay();
     };
 });
 
-},{"p5":"6IEby","./handModelMediaPipe.js":"3NAKG","./videoFeedUtils":"KriuE","./landmarksHandler":"gNlhQ","./orthogonalGridDeform":"fCxIP","./utils.js":"1X9hu","url:../assets/images/grid.png":"ceOPV","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6IEby":[function(require,module,exports,__globalThis) {
+},{"p5":"6IEby","./handModelMediaPipe.js":"3NAKG","./faceModelMediaPipe.js":"77VZ0","./videoFeedUtils":"KriuE","./landmarksHandler":"gNlhQ","./orthogonalGridDeform":"fCxIP","url:../assets/images/grid.png":"ceOPV","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"6IEby":[function(require,module,exports,__globalThis) {
 /*! p5.js v1.11.10 August 23, 2025 */ var global = arguments[3];
 !function(e1) {
     module.exports = e1();
@@ -46682,7 +46747,60 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"KriuE":[function(require,module,exports,__globalThis) {
+},{}],"77VZ0":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "faceMediaPipe", ()=>faceMediaPipe);
+var _tasksVision = require("@mediapipe/tasks-vision");
+const MODEL_URL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task";
+const MODEL_URL_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
+const NUM_FACES = 1;
+const RUNNING_MODE = "VIDEO";
+let faceLandmarker;
+let lastVideoTime = -1;
+const faceMediaPipe = {
+    landmarks: [],
+    initialize: async ()=>{
+        try {
+            const vision = await (0, _tasksVision.FilesetResolver).forVisionTasks(MODEL_URL_WASM);
+            faceLandmarker = await (0, _tasksVision.FaceLandmarker).createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: MODEL_URL,
+                    delegate: "GPU"
+                },
+                runningMode: RUNNING_MODE,
+                numFaces: NUM_FACES
+            });
+        } catch (error) {
+            console.error("Failed to initialize FaceLandmarker:", error);
+        }
+    },
+    predictWebcam: async (video)=>{
+        try {
+            if (faceLandmarker && video.elt.readyState >= 2 && video.elt.videoWidth > 0 && video.elt.videoHeight > 0) {
+                if (lastVideoTime !== video.elt.currentTime) {
+                    lastVideoTime = video.elt.currentTime;
+                    const results = await faceLandmarker.detectForVideo(video.elt, performance.now());
+                    if (results) faceMediaPipe.landmarks = results.faceLandmarks || [];
+                }
+            }
+        } catch (error) {
+            console.warn("Face prediction error (recovering):", error.message);
+        }
+        window.requestAnimationFrame(()=>faceMediaPipe.predictWebcam(video));
+    },
+    getMouthOpen: ()=>{
+        if (faceMediaPipe.landmarks.length === 0) return 0;
+        const face = faceMediaPipe.landmarks[0];
+        const upperLip = face[13];
+        const lowerLip = face[14];
+        if (!upperLip || !lowerLip) return 0;
+        return Math.abs(lowerLip.y - upperLip.y);
+    }
+};
+faceMediaPipe.initialize();
+
+},{"@mediapipe/tasks-vision":"bu3NE","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"KriuE":[function(require,module,exports,__globalThis) {
 // Version 2.0 - 23.06.2025
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -46694,12 +46812,12 @@ function initializeCamCapture(sk, mediaPipeHandler) {
         audio: false,
         video: {
             width: {
-                ideal: 1920,
-                min: 1280
+                ideal: 1280,
+                min: 1024
             },
             height: {
-                ideal: 1080,
-                min: 720
+                ideal: 720,
+                min: 576
             },
             frameRate: {
                 ideal: 30,
@@ -46893,23 +47011,6 @@ function draw(state) {
         sk.endShape(sk.CLOSE);
     }
     sk.pop();
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"1X9hu":[function(require,module,exports,__globalThis) {
-// ---- SAVE P5 CANVAS SNAPSHOT AS PNG
-// -----------------------------------
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "saveSnapshot", ()=>saveSnapshot);
-let countSaved = 1;
-function saveSnapshot(sk, defaultDensity, densityFactor = 2) {
-    const currentDensity = sk.pixelDensity();
-    sk.pixelDensity(defaultDensity * densityFactor);
-    sk.redraw();
-    sk.saveCanvas(`sketch_${countSaved}`, "png");
-    countSaved++;
-    sk.pixelDensity(currentDensity);
-    sk.redraw();
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"ceOPV":[function(require,module,exports,__globalThis) {

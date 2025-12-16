@@ -6,8 +6,8 @@ export function initializeCamCapture(sk, mediaPipeHandler) {
       flipped: true,
       audio: false,
       video: {
-        width: { ideal: 1920, min: 1280 },
-        height: { ideal: 1080, min: 720 },
+        width: { ideal: 1280, min: 1024 },
+        height: { ideal: 720, min: 576 },
         frameRate: { ideal: 30, min: 24 },
       },
     },
