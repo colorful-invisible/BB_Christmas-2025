@@ -119,6 +119,7 @@ canvas {
   align-items: center;
   z-index: 100;
   backdrop-filter: blur(8px);
+  padding: 24px;
 }
 
 .overlay.hidden {
@@ -127,38 +128,60 @@ canvas {
 
 .overlay-content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 24px;
-  padding: 24px;
   max-width: 90vw;
   max-height: 90vh;
 }
 
 .overlay-content img {
-  max-width: 100%;
-  max-height: calc(90vh - 100px);
+  max-height: 80vh;
+  max-width: 60vw;
   border: 2px solid #fff;
   object-fit: contain;
 }
 
 .overlay-buttons {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .overlay-buttons button {
-  padding: 12px 24px;
+  padding: 8px 16px;
   font-size: 14px;
-  font-family: inherit;
+  font-family: monospace;
   background: transparent;
   color: #fff;
   border: 1px solid #fff;
+  border-radius: 16px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
 }
 
 .overlay-buttons button:hover {
   background: #fff;
   color: #000;
+}
+
+/* Mobile overlay */
+@media (orientation: portrait) {
+  .overlay {
+    padding: 8px;
+    align-items: flex-start;
+    padding-top: 10vh;
+  }
+
+  .overlay-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .overlay-content img {
+    max-width: 80vw;
+    max-height: 60vh;
+  }
 }

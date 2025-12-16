@@ -99,6 +99,7 @@ canvas {
   align-items: center;
   width: 100%;
   height: 100%;
+  padding: 24px;
   display: flex;
   position: fixed;
   top: 0;
@@ -110,34 +111,36 @@ canvas {
 }
 
 .overlay-content {
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 24px;
   max-width: 90vw;
   max-height: 90vh;
-  padding: 24px;
   display: flex;
 }
 
 .overlay-content img {
   object-fit: contain;
   border: 2px solid #fff;
-  max-width: 100%;
-  max-height: calc(90vh - 100px);
+  max-width: 60vw;
+  max-height: 80vh;
 }
 
 .overlay-buttons {
-  gap: 16px;
+  flex-direction: column;
+  gap: 8px;
   display: flex;
 }
 
 .overlay-buttons button {
   color: #fff;
   cursor: pointer;
+  white-space: nowrap;
   background: none;
   border: 1px solid #fff;
-  padding: 12px 24px;
-  font-family: inherit;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-family: monospace;
   font-size: 14px;
   transition: background .2s, color .2s;
 }
@@ -145,5 +148,23 @@ canvas {
 .overlay-buttons button:hover {
   color: #000;
   background: #fff;
+}
+
+@media (orientation: portrait) {
+  .overlay {
+    align-items: flex-start;
+    padding: 10vh 8px 8px;
+  }
+
+  .overlay-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .overlay-content img {
+    max-width: 80vw;
+    max-height: 60vh;
+  }
 }
 /*# sourceMappingURL=generative-christmas.4ee4707b.css.map */

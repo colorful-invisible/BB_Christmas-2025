@@ -8,6 +8,8 @@ import img01 from "url:../assets/images/grid.png";
 
 const MARGIN = 24;
 const GAP = 24;
+const MARGIN_MOBILE = 8;
+const GAP_MOBILE = 8;
 const THUMB_FRACTION = 1 / 5;
 const MOUTH_OPEN_THRESHOLD = 0.05;
 
@@ -84,17 +86,39 @@ new p5((sk) => {
     sk.background(0);
     sk.translate(-sk.width / 2, -sk.height / 2);
 
-    const contentWidth = sk.width - MARGIN * 2;
-    const contentHeight = sk.height - MARGIN * 2;
-
-    const thumbWidth = contentWidth * THUMB_FRACTION;
+    const isMobile = sk.width < sk.height;
+    const margin = isMobile ? MARGIN_MOBILE : MARGIN;
+    const gap = isMobile ? GAP_MOBILE : GAP;
+    const contentWidth = sk.width - margin * 2;
+    const contentHeight = sk.height - margin * 2;
     const thumbAspect = camFeed ? camFeed.width / camFeed.height : 16 / 9;
-    const thumbHeight = thumbWidth / thumbAspect;
 
-    const imgX = MARGIN + thumbWidth + GAP;
-    const imgY = MARGIN;
-    const imgWidth = contentWidth - thumbWidth - GAP;
-    const imgHeight = contentHeight;
+    let thumbX, thumbY, thumbWidth, thumbHeight;
+    let imgX, imgY, imgWidth, imgHeight;
+
+    if (isMobile) {
+      // Mobile: thumb on top (right-aligned), image below
+      thumbHeight = contentHeight * THUMB_FRACTION;
+      thumbWidth = thumbHeight * thumbAspect;
+      thumbX = margin + contentWidth - thumbWidth;
+      thumbY = margin;
+
+      imgX = margin;
+      imgY = margin + thumbHeight + gap;
+      imgWidth = contentWidth;
+      imgHeight = contentHeight - thumbHeight - gap;
+    } else {
+      // Desktop: thumb on left, image on right
+      thumbWidth = contentWidth * THUMB_FRACTION;
+      thumbHeight = thumbWidth / thumbAspect;
+      thumbX = margin;
+      thumbY = margin;
+
+      imgX = margin + thumbWidth + gap;
+      imgY = margin;
+      imgWidth = contentWidth - thumbWidth - gap;
+      imgHeight = contentHeight;
+    }
 
     gridDeform.setBounds(imgX, imgY, imgWidth, imgHeight);
 
@@ -118,12 +142,12 @@ new p5((sk) => {
       }
       sk._g.image(camFeed, 0, 0, sk._g.width, sk._g.height);
       sk._g.filter(sk.GRAY);
-      sk.image(sk._g, MARGIN, MARGIN, thumbWidth, thumbHeight);
+      sk.image(sk._g, thumbX, thumbY, thumbWidth, thumbHeight);
 
       sk.noFill();
       sk.stroke(0);
       sk.strokeWeight(1);
-      sk.rect(MARGIN, MARGIN, thumbWidth, thumbHeight);
+      sk.rect(thumbX, thumbY, thumbWidth, thumbHeight);
 
       // Draw anchor rectangle on thumb
       if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
@@ -134,28 +158,28 @@ new p5((sk) => {
           LM.LX8,
           camFeed.x,
           camFeed.scaledWidth,
-          MARGIN,
+          thumbX,
           thumbWidth
         );
         const rightX = mapToThumb(
           LM.RX8,
           camFeed.x,
           camFeed.scaledWidth,
-          MARGIN,
+          thumbX,
           thumbWidth
         );
         const topY = mapToThumb(
           LM.RY8,
           camFeed.y,
           camFeed.scaledHeight,
-          MARGIN,
+          thumbY,
           thumbHeight
         );
         const bottomY = mapToThumb(
           LM.RY4,
           camFeed.y,
           camFeed.scaledHeight,
-          MARGIN,
+          thumbY,
           thumbHeight
         );
 
