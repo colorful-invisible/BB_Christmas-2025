@@ -28,6 +28,7 @@ main {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  height: 100dvh;
 }
 
 canvas {
@@ -43,9 +44,11 @@ canvas {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100dvw;
+  width: 100vw;
+  height: 100vh;
   height: 100dvh;
   padding: 1.25rem;
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
   background: #000;
   display: flex;
   justify-content: center;
@@ -53,6 +56,7 @@ canvas {
   z-index: 200;
   opacity: 1;
   transition: opacity 0.3s ease-out;
+  overflow-y: auto;
 }
 
 .intro.hidden {
@@ -67,6 +71,18 @@ canvas {
   gap: 1.5rem;
   font-size: 1.25rem;
   line-height: 1.5;
+  max-height: 100%;
+}
+
+@media (orientation: portrait) {
+  .intro {
+    align-items: flex-start;
+    padding-top: 3rem;
+  }
+
+  .intro-content {
+    font-size: 1.1rem;
+  }
 }
 
 .intro-content h2 {
@@ -103,15 +119,18 @@ canvas {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100dvw;
+  width: 100vw;
+  height: 100vh;
   height: 100dvh;
   padding: 1.25rem;
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
   background: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 100;
   backdrop-filter: blur(8px);
+  overflow-y: auto;
 }
 
 .overlay.hidden {
@@ -122,14 +141,18 @@ canvas {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
+  max-width: 90vw;
 }
 
 .overlay-content > img {
-  max-height: 80%;
-  max-width: 60%;
+  max-height: 70vh;
+  max-height: 70dvh;
+  max-width: 55vw;
   border: 2px solid #fff;
   object-fit: contain;
+  flex-shrink: 1;
 }
 
 .overlay-buttons {
@@ -180,28 +203,39 @@ canvas {
 /* Mobile overlay */
 @media (orientation: portrait) {
   .overlay {
-    padding: 0.5rem;
-    align-items: flex-start;
-    padding-top: 10vh;
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+    align-items: center;
+    justify-content: center;
   }
 
   .overlay-content {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    padding-top: 2rem;
   }
 
   .overlay-content > img {
-    max-width: 80vw;
-    max-height: 60vh;
+    max-width: 85vw;
+    max-height: 50vh;
+    max-height: 50dvh;
   }
 
   .overlay-buttons-mobile {
     display: flex;
+    padding-bottom: 1rem;
   }
 
   .overlay-buttons-desktop,
   .btn-again-desktop {
     display: none;
+  }
+
+  .btn {
+    padding: 0.25rem 0.75rem 0.3rem 0.75rem;
+    font-size: 1rem;
   }
 }
