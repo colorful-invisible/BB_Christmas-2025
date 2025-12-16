@@ -738,12 +738,15 @@ new (0, _p5Default.default)((sk)=>{
         4
     ];
     // DOM elements
+    const intro = document.getElementById("intro");
+    const btnStart = document.getElementById("btn-start");
     const overlay = document.getElementById("overlay");
     const snapshotImg = document.getElementById("snapshot-img");
     const btnDownload = document.getElementById("btn-download");
     const btnShare = document.getElementById("btn-share");
     const btnAgain = document.getElementById("btn-again");
     // Button handlers
+    btnStart.addEventListener("click", ()=>intro.classList.add("hidden"));
     btnDownload.addEventListener("click", downloadSnapshot);
     btnShare.addEventListener("click", shareSnapshot);
     btnAgain.addEventListener("click", closeOverlay);
