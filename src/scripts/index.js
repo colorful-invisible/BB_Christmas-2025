@@ -35,6 +35,8 @@ new p5((sk) => {
   const btnEmail = document.getElementById("btn-email");
   const btnWhatsApp = document.getElementById("btn-whatsapp");
   const btnTwitter = document.getElementById("btn-twitter");
+  const btnInfo = document.getElementById("btn-info");
+  const credits = document.getElementById("credits");
 
   // Button handlers
   btnStart.addEventListener("click", startExperience);
@@ -46,6 +48,11 @@ new p5((sk) => {
   btnEmail?.addEventListener("click", shareViaEmail);
   btnWhatsApp?.addEventListener("click", shareViaWhatsApp);
   btnTwitter?.addEventListener("click", shareViaTwitter);
+  btnInfo?.addEventListener("click", toggleCredits);
+
+  function toggleCredits() {
+    credits?.classList.toggle("hidden");
+  }
 
   function startExperience() {
     intro.classList.add("hidden");
