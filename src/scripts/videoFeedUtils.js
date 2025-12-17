@@ -1,19 +1,20 @@
-let cameraInitialized = false;
-
-export function initializeCamCapture(sk, mediaPipeHandler) {
-  let camFeed;
-  cameraInitialized = false;
-
-  // Timeout to detect if camera never initializes
-  const timeout = setTimeout(() => {
-    if (!cameraInitialized) {
-      console.error("Camera initialization timeout - permission likely denied");
-      showCameraError();
-    }
-  }, 3000);
-
+export async function initializeCamCapture(sk, mediaPipeHandler) {
   try {
-    camFeed = sk.createCapture(
+    // Request permission explicitly - this catches denial immediately
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { ideal: 1280, min: 1024 },
+        height: { ideal: 720, min: 576 },
+        frameRate: { ideal: 30, min: 24 },
+      },
+      audio: false,
+    });
+
+    // Permission granted - stop test stream, let p5 create its own
+    stream.getTracks().forEach((track) => track.stop());
+
+    // Now create p5 capture (will succeed since permission was granted)
+    const camFeed = sk.createCapture(
       {
         flipped: true,
         audio: false,
@@ -23,38 +24,28 @@ export function initializeCamCapture(sk, mediaPipeHandler) {
           frameRate: { ideal: 30, min: 24 },
         },
       },
-      (stream) => {
-        if (stream) {
-          clearTimeout(timeout);
-          cameraInitialized = true;
-          console.log(stream.getTracks()[0].getSettings());
+      (capturedStream) => {
+        if (capturedStream) {
+          console.log(capturedStream.getTracks()[0].getSettings());
           updateFeedDimensions(sk, camFeed, false);
           mediaPipeHandler.predictWebcam(camFeed);
-        } else {
-          clearTimeout(timeout);
-          showCameraError();
         }
-      },
-      (error) => {
-        clearTimeout(timeout);
-        console.error("Camera access error:", error);
-        showCameraError();
       }
     );
 
     camFeed.elt.setAttribute("playsinline", "");
     camFeed.hide();
-  } catch (error) {
-    clearTimeout(timeout);
-    console.error("Camera initialization error:", error);
-    showCameraError();
-  }
 
-  return camFeed;
+    return camFeed;
+  } catch (error) {
+    // Catches: NotAllowedError (denied), NotFoundError (no camera), etc.
+    console.error("Camera error:", error.name, error.message);
+    showCameraError();
+    return null;
+  }
 }
 
 function showCameraError() {
-  // Remove any existing error messages
   const existing = document.querySelector(".camera-error-message");
   if (existing) return;
 
@@ -67,11 +58,7 @@ function showCameraError() {
   errorDiv.appendChild(errorP);
 
   const main = document.querySelector("main");
-  if (main) {
-    main.appendChild(errorDiv);
-  } else {
-    document.body.appendChild(errorDiv);
-  }
+  (main || document.body).appendChild(errorDiv);
 }
 
 export function updateFeedDimensions(sk, feed, fitToHeight = false) {
@@ -87,16 +74,13 @@ export function updateFeedDimensions(sk, feed, fitToHeight = false) {
 
   if (canvasRatio > videoRatio) {
     if (fitToHeight) {
-      // Fit to canvas height, center horizontally, Portrait mode
       w = sk.height * videoRatio;
       x = (sk.width - w) / 2;
     } else {
-      // Fit to canvas width, center vertically, Landscape mode
       h = sk.width / videoRatio;
       y = (sk.height - h) / 2;
     }
   } else {
-    // Video is wider - fit to height, center horizontally
     w = sk.height * videoRatio;
     x = (sk.width - w) / 2;
   }
@@ -106,15 +90,10 @@ export function updateFeedDimensions(sk, feed, fitToHeight = false) {
   feed.x = x;
   feed.y = y;
 }
+
 export function stopCamCapture(feed) {
-  if (feed && feed.elt.srcObject) {
-    const stream = feed.elt.srcObject;
-    const tracks = stream.getTracks();
-
-    tracks.forEach((track) => {
-      track.stop();
-    });
-
+  if (feed?.elt?.srcObject) {
+    feed.elt.srcObject.getTracks().forEach((track) => track.stop());
     feed.elt.srcObject = null;
   }
 }

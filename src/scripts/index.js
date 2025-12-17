@@ -60,16 +60,22 @@ new p5((sk) => {
 
   async function startExperience() {
     intro.classList.add("hidden");
+
     if (!camFeed) {
       document.body.classList.add("loading");
 
       await mediaPipe.initialize();
       await faceMediaPipe.initialize();
 
+      // initializeCamCapture is now async and handles errors internally
+      camFeed = await initializeCamCapture(sk, mediaPipe);
+
       document.body.classList.remove("loading");
 
-      camFeed = initializeCamCapture(sk, mediaPipe);
-      faceMediaPipe.predictWebcam(camFeed);
+      // Only start face prediction if camera was successfully initialized
+      if (camFeed) {
+        faceMediaPipe.predictWebcam(camFeed);
+      }
     }
   }
 
@@ -90,9 +96,7 @@ new p5((sk) => {
     link.href = snapshotImg.src;
     document.body.appendChild(link);
     link.click();
-    setTimeout(() => {
-      document.body.removeChild(link);
-    }, 100);
+    setTimeout(() => document.body.removeChild(link), 100);
   }
 
   const SHARE_TITLE = "Geb auch Du Intoleranz keinen Platz!";
@@ -141,7 +145,6 @@ new p5((sk) => {
   };
 
   sk.setup = () => {
-    // Use window.innerWidth/Height for consistent sizing
     sk.createCanvas(window.innerWidth, window.innerHeight, sk.WEBGL);
   };
 
@@ -160,7 +163,6 @@ new p5((sk) => {
     let imgX, imgY, imgWidth, imgHeight;
 
     if (isMobile) {
-      // Mobile: image on top, thumb on bottom right
       thumbHeight = contentHeight * THUMB_FRACTION;
       thumbWidth = thumbHeight * thumbAspect;
 
@@ -172,7 +174,6 @@ new p5((sk) => {
       thumbX = margin + contentWidth - thumbWidth;
       thumbY = margin + imgHeight + gap;
     } else {
-      // Desktop: thumb on left, image on right
       thumbWidth = contentWidth * THUMB_FRACTION;
       thumbHeight = thumbWidth / thumbAspect;
       thumbX = margin;
@@ -197,7 +198,6 @@ new p5((sk) => {
       const targetWidth = Math.round(thumbWidth);
       const targetHeight = Math.round(thumbHeight);
 
-      // Only recreate graphics buffer if size changed significantly
       if (
         !thumbGraphics ||
         Math.abs(thumbGraphics.width - targetWidth) > 2 ||
@@ -229,7 +229,6 @@ new p5((sk) => {
       sk.strokeWeight(1);
       sk.rect(thumbX, thumbY, thumbWidth, thumbHeight);
 
-      // Draw anchor rectangle on thumb
       if (LM.LX8 && LM.RX8 && LM.RY8 && LM.RY4) {
         const mapToThumb = (val, feedStart, feedSize, thumbStart, thumbSize) =>
           thumbStart + ((val - feedStart) / feedSize) * thumbSize;
@@ -296,7 +295,6 @@ new p5((sk) => {
   };
 
   sk.windowResized = () => {
-    // Debounce resize to prevent WebGL context buildup
     if (resizeTimeout) {
       clearTimeout(resizeTimeout);
     }
@@ -330,7 +328,6 @@ new p5((sk) => {
     }
   };
 
-  // Cleanup on remove
   sk.remove = () => {
     if (thumbGraphics) {
       thumbGraphics.remove();
