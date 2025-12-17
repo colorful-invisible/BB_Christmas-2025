@@ -61,20 +61,14 @@ new p5((sk) => {
   async function startExperience() {
     intro.classList.add("hidden");
     if (!camFeed) {
-      // Add a loading indicator
       document.body.classList.add("loading");
 
       await mediaPipe.initialize();
       await faceMediaPipe.initialize();
 
-      // Remove the loading indicator
       document.body.classList.remove("loading");
 
       camFeed = initializeCamCapture(sk, mediaPipe);
-      if (!camFeed) {
-        // Handle the case where camera access is denied
-        return;
-      }
       faceMediaPipe.predictWebcam(camFeed);
     }
   }

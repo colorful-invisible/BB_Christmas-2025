@@ -16,9 +16,6 @@ export function initializeCamCapture(sk, mediaPipeHandler) {
         console.log(stream.getTracks()[0].getSettings());
         updateFeedDimensions(sk, camFeed, false);
         mediaPipeHandler.predictWebcam(camFeed);
-      } else {
-        console.error("Camera access denied.");
-        return null;
       }
     }
   );
