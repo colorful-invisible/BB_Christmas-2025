@@ -36,9 +36,6 @@ new p5((sk) => {
   const btnShare = document.getElementById("btn-share");
   const btnAgain = document.getElementById("btn-again");
   const btnAgainMobile = document.getElementById("btn-again-mobile");
-  const btnEmail = document.getElementById("btn-email");
-  const btnWhatsApp = document.getElementById("btn-whatsapp");
-  const btnTwitter = document.getElementById("btn-twitter");
   const btnInfo = document.getElementById("btn-info");
   const credits = document.getElementById("credits");
 
@@ -49,9 +46,6 @@ new p5((sk) => {
   btnShare?.addEventListener("click", shareSnapshot);
   btnAgain?.addEventListener("click", closeOverlay);
   btnAgainMobile?.addEventListener("click", closeOverlay);
-  btnEmail?.addEventListener("click", shareViaEmail);
-  btnWhatsApp?.addEventListener("click", shareViaWhatsApp);
-  btnTwitter?.addEventListener("click", shareViaTwitter);
   btnInfo?.addEventListener("click", toggleCredits);
 
   function toggleCredits() {
@@ -92,7 +86,7 @@ new p5((sk) => {
 
   function downloadSnapshot() {
     const link = document.createElement("a");
-    link.download = `snapshot_${Date.now()}.png`;
+    link.download = `Kein-Platz-fuer-Intoleranz.png`;
     link.href = snapshotImg.src;
     document.body.appendChild(link);
     link.click();
@@ -121,22 +115,6 @@ new p5((sk) => {
     } catch (err) {
       console.error("Error sharing snapshot:", err);
     }
-  }
-
-  function shareViaEmail() {
-    const subject = encodeURIComponent(SHARE_TITLE);
-    const body = encodeURIComponent(SHARE_TEXT);
-    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
-  }
-
-  function shareViaWhatsApp() {
-    const text = encodeURIComponent(SHARE_TEXT);
-    window.open(`https://wa.me/?text=${text}`, "_blank");
-  }
-
-  function shareViaTwitter() {
-    const text = encodeURIComponent(SHARE_TEXT);
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
   }
 
   sk.preload = () => {

@@ -1,39 +1,37 @@
 @font-face {
-  font-family: "Everett-Mono";
-  src: url(../assets/fonts/EverettMono-Regular.woff2) format("woff2"),
-    url(../assets/fonts/EverettMono-Regular.woff) format("woff");
+  font-family: Everett-Mono;
+  src: url("EverettMono-Regular.83489e7c.woff2") format("woff2"), url("EverettMono-Regular.0fd8f795.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
 
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html {
-  font-family: "Everett-Mono", monospace, Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  background: #000;
   color: #fff;
+  background: #000;
+  font-family: Everett-Mono, monospace, Arial, Helvetica, sans-serif;
+  font-size: 16px;
   line-height: 1.5;
 }
 
 main {
-  position: relative;
-  display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   height: 100dvh;
+  display: flex;
+  position: relative;
 }
 
 canvas {
+  z-index: -1;
   position: absolute;
   top: 0;
   left: 0;
-  z-index: -1;
 }
 
 a {
@@ -42,35 +40,35 @@ a {
 }
 
 .info-panel {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
   z-index: 50;
-  display: flex;
   flex-direction: column-reverse;
   align-items: flex-start;
   gap: 1rem;
+  display: flex;
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
 }
 
 .btn-info {
+  cursor: pointer;
+  background: none;
+  border: none;
+  justify-content: center;
+  align-items: center;
   width: 1.5rem;
   height: 1.5rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 0;
+  display: flex;
 }
 
 .btn-info img {
+  object-fit: contain;
+  filter: invert();
+  opacity: .75;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  filter: invert(1);
-  opacity: 0.75;
-  transition: opacity 0.2s;
+  transition: opacity .2s;
 }
 
 .btn-info:hover img {
@@ -78,10 +76,10 @@ a {
 }
 
 .credits {
-  display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  font-size: 0.875rem;
+  gap: .75rem;
+  font-size: .875rem;
+  display: flex;
 }
 
 .credits.hidden {
@@ -97,21 +95,20 @@ a {
 }
 
 .intro {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100vw;
-  height: 100vh;
   height: 100dvh;
   padding: 1.25rem;
   padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 200;
   opacity: 1;
-  transition: opacity 0.3s ease-out;
+  background: #000;
+  justify-content: center;
+  align-items: center;
+  transition: opacity .3s ease-out;
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
   overflow-y: auto;
 }
 
@@ -121,12 +118,12 @@ a {
 }
 
 .intro-content {
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.5rem;
-  font-size: 1.25rem;
   max-height: 100%;
+  font-size: 1.25rem;
+  display: flex;
 }
 
 .intro-content h2 {
@@ -135,20 +132,20 @@ a {
 }
 
 .btn {
-  padding: 0.35rem 1rem 0.4rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  background-color: #0000;
   border: 2px solid #fff;
   border-radius: 9999px;
-  background-color: transparent;
+  padding: .35rem 1rem .4rem;
+  font-family: Everett-Mono, monospace, Arial, Helvetica, sans-serif;
   font-size: 1.25rem;
-  color: #fff;
-  font-family: "Everett-Mono", monospace, Arial, Helvetica, sans-serif;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.2s;
+  transition: background-color .3s, color .2s;
 }
 
 .btn:hover {
-  background-color: #fff;
   color: #000;
+  background-color: #fff;
 }
 
 .btn-start {
@@ -156,20 +153,19 @@ a {
 }
 
 .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100vw;
-  height: 100vh;
   height: 100dvh;
   padding: 1.25rem;
   padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 100;
   backdrop-filter: blur(8px);
+  background: #000000bf;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
   overflow-y: auto;
 }
 
@@ -178,27 +174,26 @@ a {
 }
 
 .overlay-content {
-  display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 1.5rem;
   max-width: 90vw;
+  display: flex;
 }
 
 .overlay-content > img {
-  max-height: 70vh;
-  max-height: 70dvh;
-  max-width: 55vw;
-  border: 2px solid #fff;
   object-fit: contain;
+  border: 2px solid #fff;
   flex-shrink: 1;
+  max-width: 55vw;
+  max-height: 70dvh;
 }
 
 .overlay-buttons {
-  display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: .5rem;
+  display: flex;
 }
 
 .overlay-buttons-mobile {
@@ -206,9 +201,9 @@ a {
 }
 
 .overlay-buttons-desktop {
-  display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  display: flex;
 }
 
 .btn-again-desktop {
@@ -217,24 +212,24 @@ a {
 
 .camera-error-message {
   color: #fff;
+  max-width: 20%;
   font-size: 1rem;
   position: absolute;
   top: 1.75rem;
   left: 1.5rem;
-  max-width: 20%;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .info-panel {
-    bottom: 1rem;
-    left: 1rem;
+    padding-bottom: env(safe-area-inset-bottom, 0);
     flex-direction: row;
     align-items: flex-end;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    bottom: 1rem;
+    left: 1rem;
   }
 
   .credits {
-    font-size: 0.75rem;
+    font-size: .75rem;
   }
 
   .intro {
@@ -247,9 +242,9 @@ a {
   }
 
   .overlay {
-    padding: 1rem;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    padding: 1rem;
   }
 
   .overlay-content {
@@ -262,38 +257,37 @@ a {
 
   .overlay-content > img {
     max-width: 85vw;
-    max-height: 50vh;
     max-height: 50dvh;
   }
 
   .overlay-buttons-mobile {
-    display: flex;
     padding-bottom: 1rem;
+    display: flex;
   }
 
-  .overlay-buttons-desktop,
-  .btn-again-desktop {
+  .overlay-buttons-desktop, .btn-again-desktop {
     display: none;
   }
 
   .btn {
-    padding: 0.25rem 0.75rem 0.3rem 0.75rem;
+    padding: .25rem .75rem .3rem;
     font-size: 1rem;
   }
 
   .camera-error-message {
-    font-size: 0.75rem;
+    text-align: right;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    max-width: 100%;
+    font-size: .75rem;
+    display: flex;
     bottom: 1rem;
     right: 1rem;
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-end;
-    text-align: right;
   }
 
   .camera-error-message p {
     width: 50%;
   }
 }
+/*# sourceMappingURL=generative-christmas.4ee4707b.css.map */
