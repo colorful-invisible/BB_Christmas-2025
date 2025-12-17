@@ -16,6 +16,7 @@ html {
   background: #000;
   font-family: Everett-Mono, monospace, Arial, Helvetica, sans-serif;
   font-size: 16px;
+  line-height: 1.5;
 }
 
 main {
@@ -40,8 +41,8 @@ a {
 
 .info-panel {
   z-index: 50;
-  flex-direction: row;
-  align-items: flex-end;
+  flex-direction: column-reverse;
+  align-items: flex-start;
   gap: 1rem;
   display: flex;
   position: fixed;
@@ -78,9 +79,7 @@ a {
   flex-direction: column;
   gap: .75rem;
   font-size: .875rem;
-  line-height: 1.4;
   display: flex;
-  transform: translateY(4px);
 }
 
 .credits.hidden {
@@ -93,18 +92,6 @@ a {
 
 .credits u {
   text-decoration: underline;
-}
-
-@media (orientation: portrait) {
-  .info-panel {
-    padding-bottom: env(safe-area-inset-bottom, 0);
-    bottom: .5rem;
-    left: .5rem;
-  }
-
-  .credits {
-    font-size: .75rem;
-  }
 }
 
 .intro {
@@ -136,19 +123,7 @@ a {
   gap: 1.5rem;
   max-height: 100%;
   font-size: 1.25rem;
-  line-height: 1.5;
   display: flex;
-}
-
-@media (orientation: portrait) {
-  .intro {
-    align-items: flex-start;
-    padding-top: 3rem;
-  }
-
-  .intro-content {
-    font-size: 1.1rem;
-  }
 }
 
 .intro-content h2 {
@@ -259,7 +234,37 @@ a {
   height: 100%;
 }
 
-@media (orientation: portrait) {
+.camera-error-message {
+  color: #fff;
+  max-width: 20%;
+  font-size: 1rem;
+  position: absolute;
+  top: 1.75rem;
+  left: 1.5rem;
+}
+
+@media (width <= 768px) {
+  .info-panel {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    flex-direction: row;
+    align-items: flex-end;
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  .credits {
+    font-size: .75rem;
+  }
+
+  .intro {
+    align-items: flex-start;
+    padding-top: 3rem;
+  }
+
+  .intro-content {
+    font-size: 1.1rem;
+  }
+
   .overlay {
     justify-content: center;
     align-items: center;
@@ -291,6 +296,22 @@ a {
   .btn {
     padding: .25rem .75rem .3rem;
     font-size: 1rem;
+  }
+
+  .camera-error-message {
+    text-align: right;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    max-width: 100%;
+    font-size: .75rem;
+    display: flex;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .camera-error-message p {
+    width: 50%;
   }
 }
 /*# sourceMappingURL=generative-christmas.4ee4707b.css.map */

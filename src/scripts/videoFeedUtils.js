@@ -1,29 +1,77 @@
-// Version 2.0 - 23.06.2025
+let cameraInitialized = false;
 
 export function initializeCamCapture(sk, mediaPipeHandler) {
-  const camFeed = sk.createCapture(
-    {
-      flipped: true,
-      audio: false,
-      video: {
-        width: { ideal: 1280, min: 1024 },
-        height: { ideal: 720, min: 576 },
-        frameRate: { ideal: 30, min: 24 },
-      },
-    },
-    (stream) => {
-      if (stream) {
-        console.log(stream.getTracks()[0].getSettings());
-        updateFeedDimensions(sk, camFeed, false);
-        mediaPipeHandler.predictWebcam(camFeed);
-      }
-    }
-  );
+  let camFeed;
+  cameraInitialized = false;
 
-  camFeed.elt.setAttribute("playsinline", "");
-  camFeed.hide();
+  // Timeout to detect if camera never initializes
+  const timeout = setTimeout(() => {
+    if (!cameraInitialized) {
+      console.error("Camera initialization timeout - permission likely denied");
+      showCameraError();
+    }
+  }, 3000);
+
+  try {
+    camFeed = sk.createCapture(
+      {
+        flipped: true,
+        audio: false,
+        video: {
+          width: { ideal: 1280, min: 1024 },
+          height: { ideal: 720, min: 576 },
+          frameRate: { ideal: 30, min: 24 },
+        },
+      },
+      (stream) => {
+        if (stream) {
+          clearTimeout(timeout);
+          cameraInitialized = true;
+          console.log(stream.getTracks()[0].getSettings());
+          updateFeedDimensions(sk, camFeed, false);
+          mediaPipeHandler.predictWebcam(camFeed);
+        } else {
+          clearTimeout(timeout);
+          showCameraError();
+        }
+      },
+      (error) => {
+        clearTimeout(timeout);
+        console.error("Camera access error:", error);
+        showCameraError();
+      }
+    );
+
+    camFeed.elt.setAttribute("playsinline", "");
+    camFeed.hide();
+  } catch (error) {
+    clearTimeout(timeout);
+    console.error("Camera initialization error:", error);
+    showCameraError();
+  }
 
   return camFeed;
+}
+
+function showCameraError() {
+  // Remove any existing error messages
+  const existing = document.querySelector(".camera-error-message");
+  if (existing) return;
+
+  const errorDiv = document.createElement("div");
+  errorDiv.className = "camera-error-message";
+
+  const errorP = document.createElement("p");
+  errorP.textContent =
+    "Um das Tool zu nutzen, lade die Seite neu und erlaube den Kamera Zugriff";
+  errorDiv.appendChild(errorP);
+
+  const main = document.querySelector("main");
+  if (main) {
+    main.appendChild(errorDiv);
+  } else {
+    document.body.appendChild(errorDiv);
+  }
 }
 
 export function updateFeedDimensions(sk, feed, fitToHeight = false) {
