@@ -36,3 +36,9 @@ To build and run the project, you need to have Node.js and npm installed.
     *   `landmarksHandler.js`: Processes and maps the landmarks from MediaPipe.
     *   `orthogonalGridDeform.js`: The logic for deforming the grid.
 *   The project uses `parcel` to bundle the code, which simplifies the development process by automatically handling dependencies and transformations.
+
+# Work Completed
+
+*   **Bug Fixes:**
+    *   **Race Condition in Initialization:** Fixed a race condition where the hand and face MediaPipe models were initializing concurrently. The initialization is now sequential.
+    *   **Memory Leaks from Unreleased Resources:** Fixed memory leaks by ensuring that the camera feed and MediaPipe models are properly closed and released when they are no longer needed.

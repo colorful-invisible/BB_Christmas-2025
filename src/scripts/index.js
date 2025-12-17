@@ -1,7 +1,11 @@
 import p5 from "p5";
 import { mediaPipe } from "./handModelMediaPipe.js";
 import { faceMediaPipe } from "./faceModelMediaPipe.js";
-import { initializeCamCapture, updateFeedDimensions } from "./videoFeedUtils";
+import {
+  initializeCamCapture,
+  updateFeedDimensions,
+  stopCamCapture,
+} from "./videoFeedUtils";
 import { getMappedLandmarks } from "./landmarksHandler";
 import { createGridDeform } from "./orthogonalGridDeform";
 import img01 from "url:../assets/images/grid.png";
@@ -54,9 +58,18 @@ new p5((sk) => {
     credits?.classList.toggle("hidden");
   }
 
-  function startExperience() {
+  async function startExperience() {
     intro.classList.add("hidden");
     if (!camFeed) {
+      // Add a loading indicator
+      document.body.classList.add("loading");
+
+      await mediaPipe.initialize();
+      await faceMediaPipe.initialize();
+
+      // Remove the loading indicator
+      document.body.classList.remove("loading");
+
       camFeed = initializeCamCapture(sk, mediaPipe);
       if (!camFeed) {
         // Handle the case where camera access is denied
@@ -329,5 +342,8 @@ new p5((sk) => {
       thumbGraphics.remove();
       thumbGraphics = null;
     }
+    stopCamCapture(camFeed);
+    mediaPipe.close();
+    faceMediaPipe.close();
   };
 });

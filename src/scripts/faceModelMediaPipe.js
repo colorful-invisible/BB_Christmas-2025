@@ -65,6 +65,9 @@ export const faceMediaPipe = {
 
     return Math.abs(lowerLip.y - upperLip.y);
   },
+  close: () => {
+    if (faceLandmarker) {
+      faceLandmarker.close();
+    }
+  },
 };
-
-faceMediaPipe.initialize();

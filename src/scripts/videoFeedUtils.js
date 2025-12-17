@@ -61,3 +61,15 @@ export function updateFeedDimensions(sk, feed, fitToHeight = false) {
   feed.x = x;
   feed.y = y;
 }
+export function stopCamCapture(feed) {
+  if (feed && feed.elt.srcObject) {
+    const stream = feed.elt.srcObject;
+    const tracks = stream.getTracks();
+
+    tracks.forEach((track) => {
+      track.stop();
+    });
+
+    feed.elt.srcObject = null;
+  }
+}

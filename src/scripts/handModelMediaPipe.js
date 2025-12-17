@@ -52,6 +52,9 @@ export const mediaPipe = {
       console.error("Failed to predict webcam:", error);
     }
   },
+  close: () => {
+    if (handLandmarker) {
+      handLandmarker.close();
+    }
+  },
 };
-
-mediaPipe.initialize();

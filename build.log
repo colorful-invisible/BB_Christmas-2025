@@ -1,0 +1,26 @@
+
+> build
+> npm run clean && npm run build:parcel
+
+
+> clean
+> rm -rf dist/*
+
+
+> build:parcel
+> parcel build src/index.html --public-url ./
+
+Building...
+Bundling...
+Packaging & Optimizing...
+✨ Built in 4.08s
+
+dist/index.html                                2.37 kB    2.27s
+dist/info.aad46dca.svg                         1.04 kB     58ms
+dist/whatsapp.bcba8574.svg                     1.27 kB     30ms
+dist/x.12c7f889.svg                              245 B     60ms
+dist/generative-christmas.83553c09.css         3.66 kB    2.28s
+dist/EverettMono-Regular.21bb3683.woff2       19.29 kB     26ms
+dist/EverettMono-Regular.6255d626.woff        24.98 kB     29ms
+dist/generative-christmas.a837effa.js      ⚠️  1.19 MB    734ms
+dist/grid.22039446.png                       112.73 kB    2.27s
